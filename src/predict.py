@@ -45,7 +45,7 @@ def main():
             "state_of_the_building": "To renovate", "epc_score": "F",
             "has_elevator": 1, "parking_count": 0, "garden_area_m2": 0,
             "is_nearby_city_prestigious": 0,"kitchen_equipped":"Super equipped",
-            "building_year":1990,
+            "building_year":2025,
         },
     ])
 

@@ -73,14 +73,14 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[df["has_garden"] == 0, "garden_area_m2"] = 0
 
     # 4.  median filling for numeric columns
-    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
-    for col in numeric_cols:
-        df[col] = df[col].fillna(df[col].median())
+    #numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
+    #for col in numeric_cols:
+        #df[col] = df[col].fillna(df[col].median())
 
     # 5.Categorical columns filled with 'Unknown'
-    categorical_cols = df.select_dtypes(include=["object"]).columns
-    for col in categorical_cols:
-        df[col] = df[col].fillna("Unknown")
+    #categorical_cols = df.select_dtypes(include=["object"]).columns
+    #for col in categorical_cols:
+        #df[col] = df[col].fillna("Unknown")
 
     #print(df_clean.columns.tolist())
     print(f"Remaining shape: {df.shape}")
