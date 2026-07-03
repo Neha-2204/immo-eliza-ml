@@ -18,6 +18,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.model_selection import cross_val_score, KFold
 import os
 
 RANDOM_STATE = 42
@@ -51,8 +52,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """Cleans the raw dataset by 
     - Removing duplicates
     - Dropping irrelaevant columns
-    - Missing numerical values with median
-    - Missing categorical values with 'Unknown'
     """
     df = df.copy()
     # Remove duplicate listings based on property_id or property_url
@@ -137,6 +136,13 @@ def evaluate_and_diagnose(name: str, pipeline: Pipeline, X_train, X_test, y_trai
     return {"name": name, "train_r2": train_r2, "test_r2": test_r2,
             "test_mae": test_mae, "test_rmse": test_rmse, "gap": gap}
 
+def cross_validate_model(pipeline, X_train, y_train, cv_splits=5):
+    cv = KFold(n_splits=cv_splits, shuffle=True, random_state=RANDOM_STATE)
+    scores = cross_val_score(pipeline, X_train, y_train, cv=cv, scoring="r2")
+    print(f"Cross‑val R2 scores: {scores}")
+    print(f"Mean CV R2: {scores.mean():.4f}")
+    return scores.mean()
+
 
 def main():
     df = pd.read_csv(DATA_PATH)
@@ -168,21 +174,30 @@ def main():
             n_estimators=300, #more trees
             learning_rate=0.03, #slower learning, less overfitting
             min_child_weight=3, #requires more data per leaf
-            subsample =0.9,  #each tree sees 80% of rows
-            colsample_bytree=0.9,     # NEW — each tree sees 80% of features
+            subsample =0.9,  #each tree sees 90% of rows
+            colsample_bytree=0.9,     # NEW — each tree sees 90% of features
             reg_alpha=0.05,            # NEW — L1 regularization
             reg_lambda=1.0,           # NEW — L2 regularization
             random_state=RANDOM_STATE
         ),
     }
 
+    
+
     results = []
     fitted_pipelines = {}
     for name, model in candidates.items():
+        print(f"\n=== {name} ===")
         pipeline = create_model_pipeline(preprocessor, model)
+        cv_r2 = cross_validate_model(pipeline, X_train, y_train, cv_splits=5) #cross validation before fitting
+        
         pipeline.fit(X_train, y_train)
+       
+        metrics = evaluate_and_diagnose(name, pipeline, X_train, X_test, y_train, y_test) #evaluation on test metrics
+        metrics["cv_r2"] = cv_r2
+        
         fitted_pipelines[name] = pipeline
-        results.append(evaluate_and_diagnose(name, pipeline, X_train, X_test, y_train, y_test))
+        results.append(metrics)
 
     results_df = pd.DataFrame(results).sort_values("test_r2", ascending=False)
     print("\n=== Model comparison (sorted by Test R2) ===")
