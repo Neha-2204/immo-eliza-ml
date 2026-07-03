@@ -169,5 +169,7 @@ run from any working directory.
 
 ## 👩‍💻 Author
 
-**Neha** — Machine Learning Engineer
-Immo Eliza ML Project
+**Neha** 
+- [![GitHub](https://img.shields.io/badge/GitHub-Profile-black?logo=github)](https://github.com/Neha-2204)
+
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/neha-khandelwal-1a54291b7/)
